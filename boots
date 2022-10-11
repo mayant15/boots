@@ -63,7 +63,7 @@ handle_start_command() {
     # Check if a positional argument is provided on CLI
     if [[ -z $1 ]]; then
         # Check if image is defined in config
-        if [[ -z $BOOTS_DOCKER_IMAGE ]]; then
+        if [[ -z "$BOOTS_DOCKER_IMAGE" ]]; then
             print_fatal "'start' called with no image configured" print_start_usage
         fi
     elif [[ "$1" == "help" ]]; then
@@ -78,7 +78,7 @@ handle_start_command() {
 
 handle_connect_command() {
     # Validate inputs
-    if [[ -z $1 ]]; then
+    if [[ -z "$1" ]]; then
         print_fatal "'connect' expects a container ID as argument" print_connect_usage
     elif [[ "$1" == "help" ]]; then
         print_connect_usage
@@ -104,7 +104,7 @@ read_config() {
         source $CONFIG_FILE_LOCATION
     fi
 
-    if [[ -z $BOOTS_SHELL ]]; then
+    if [[ -z "$BOOTS_SHELL" ]]; then
         BOOTS_SHELL=/bin/zsh
     fi
 }
