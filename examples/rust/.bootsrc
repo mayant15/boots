@@ -1,0 +1,3 @@
+BOOTS_DOCKER_IMAGE=ghcr.io/mayant15/rust:dev
+BOOTS_SHELL=
+

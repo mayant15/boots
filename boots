@@ -1,0 +1,129 @@
+#!/usr/bin/env bash
+
+DOCKER_COMMAND=docker
+
+###############################################################################
+# Helper functions
+###############################################################################
+
+print_usage() {
+    echo "USAGE: boots <command> [options...]"
+    echo ""
+    echo "COMMANDS:"
+    echo "  init     Create a new configuration in the current directory"
+    echo "  start    Start a new container with the configured image"
+    echo "  connect  Connect to an already running container"
+    echo "  ps       List running containers"
+    echo "  help     Print this help text"
+    echo ""
+    echo "Run 'boots <command> help' for more detailed information about each command"
+}
+
+print_connect_usage() {
+    echo "USAGE: boots connect <container-id>"
+    echo ""
+    echo "EXAMPLES:"
+    echo "  boots connect ea5c3048d6e8 # Connect to the container"
+    echo "  boots connect help # Prints this help message"
+}
+
+print_start_usage() {
+    echo "USAGE: boots start [image]"
+    echo ""
+    echo "EXAMPLES:"
+    echo "  boots start # Start a new container with image defined in .bootsconf"
+    echo "  boots start alpine:latest # Start a new Alpine container"
+    echo "  boots start help # Prints this help message"
+}
+
+print_fatal() {
+    echo "ERROR: $1"
+    echo ""
+    if [[ ! -z "$2" ]]; then
+        $2
+    fi
+    exit 1
+}
+
+###############################################################################
+# CLI command implementations
+###############################################################################
+
+handle_default_command() {
+    print_fatal "invalid command" print_usage
+}
+
+handle_help_command() {
+    print_usage
+}
+
+handle_start_command() {
+    # Validate inputs
+
+    # Check if a positional argument is provided on CLI
+    if [[ -z $1 ]]; then
+        # Check if image is defined in config
+        if [[ -z $BOOTS_DOCKER_IMAGE ]]; then
+            print_fatal "'start' called with no image configured" print_start_usage
+        fi
+    elif [[ "$1" == "help" ]]; then
+        print_start_usage
+        exit 0
+    else
+        BOOTS_DOCKER_IMAGE="$1"
+    fi
+
+    $DOCKER_COMMAND run -v $(pwd):/home/main/code --rm -it $BOOTS_DOCKER_IMAGE
+}
+
+handle_connect_command() {
+    # Validate inputs
+    if [[ -z $1 ]]; then
+        print_fatal "'connect' expects a container ID as argument" print_connect_usage
+    elif [[ "$1" == "help" ]]; then
+        print_connect_usage
+        exit 0
+    fi
+
+    $DOCKER_COMMAND container exec -it $1 $BOOTS_SHELL
+}
+
+handle_ps_command() {
+    $DOCKER_COMMAND ps
+}
+
+###############################################################################
+# Steps for the script
+###############################################################################
+
+
+read_config() {
+    CONFIG_FILE_LOCATION=$(pwd)/.bootsrc
+    if [[ -f "$CONFIG_FILE_LOCATION" ]]; then
+        echo "Found config file at $CONFIG_FILE_LOCATION"
+        source $CONFIG_FILE_LOCATION
+    fi
+
+    if [[ -z $BOOTS_SHELL ]]; then
+        BOOTS_SHELL=/bin/zsh
+    fi
+}
+
+parse_commands() {
+    case $1 in
+        help)
+            handle_help_command;;
+        start)
+            handle_start_command $2;;
+        connect)
+            handle_connect_command $2;;
+        ps)
+            handle_ps_command;;
+        *)
+            handle_default_command;;
+    esac
+}
+
+read_config
+parse_commands "$@"
+
