@@ -1,0 +1,14 @@
+{
+  "name": "code",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc",
+    "prestart": "yarn build",
+    "start": "node dist/index.js"
+  },
+  "devDependencies": {
+    "typescript": "^4.8.4"
+  }
+}
