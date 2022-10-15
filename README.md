@@ -5,7 +5,7 @@ boots - The workspace bootstrapping program
 Use along with the [predefined containers](https://github.com/mayant15/devcontainers/) to get pristine workspaces
 powered by Docker!
 
-**Why?** Because I didn't want to install all these language tools and frameworks to my machine.
+**Why?** Because I didn't want to install all these language tools and frameworks to my machine. This [post](https://mayantm.com/posts/workspace-bootstrapping-with-boots/) goes into some more details.
 
 ## Usage
 
